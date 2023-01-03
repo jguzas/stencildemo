@@ -5,7 +5,16 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { ImageClickEvent } from "./components/my-carousel/my-carousel-image";
 export namespace Components {
+    interface MyCarousel {
+        "time": number;
+    }
+    interface MyCarouselImage {
+        "active": boolean;
+        "alt": string;
+        "src": string;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -21,7 +30,23 @@ export namespace Components {
         "middle": string;
     }
 }
+export interface MyCarouselImageCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMyCarouselImageElement;
+}
 declare global {
+    interface HTMLMyCarouselElement extends Components.MyCarousel, HTMLStencilElement {
+    }
+    var HTMLMyCarouselElement: {
+        prototype: HTMLMyCarouselElement;
+        new (): HTMLMyCarouselElement;
+    };
+    interface HTMLMyCarouselImageElement extends Components.MyCarouselImage, HTMLStencilElement {
+    }
+    var HTMLMyCarouselImageElement: {
+        prototype: HTMLMyCarouselImageElement;
+        new (): HTMLMyCarouselImageElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
@@ -29,10 +54,21 @@ declare global {
         new (): HTMLMyComponentElement;
     };
     interface HTMLElementTagNameMap {
+        "my-carousel": HTMLMyCarouselElement;
+        "my-carousel-image": HTMLMyCarouselImageElement;
         "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
+    interface MyCarousel {
+        "time"?: number;
+    }
+    interface MyCarouselImage {
+        "active"?: boolean;
+        "alt": string;
+        "onImageClick"?: (event: MyCarouselImageCustomEvent<ImageClickEvent>) => void;
+        "src": string;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -48,6 +84,8 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
     interface IntrinsicElements {
+        "my-carousel": MyCarousel;
+        "my-carousel-image": MyCarouselImage;
         "my-component": MyComponent;
     }
 }
@@ -55,6 +93,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "my-carousel": LocalJSX.MyCarousel & JSXBase.HTMLAttributes<HTMLMyCarouselElement>;
+            "my-carousel-image": LocalJSX.MyCarouselImage & JSXBase.HTMLAttributes<HTMLMyCarouselImageElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }
