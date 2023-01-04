@@ -1,5 +1,10 @@
-import { Component, Host, h, Prop, Element, State, Listen } from '@stencil/core';
+import { Component, Host, h, Prop, Element, State, Listen, Watch } from '@stencil/core';
 import { ImageClickEvent } from './my-carousel-image';
+
+export type img = {
+  src: string,
+  alt: string,
+}
 
 @Component({
   tag: 'my-carousel',
@@ -10,27 +15,45 @@ import { ImageClickEvent } from './my-carousel-image';
 export class MyCarousel {
 
   @Prop() time: number;
+  @Prop() source!: string;
 
   @State() activeItem: number = 1;
+  @State() images: img[] = [];
 
   @Element() element!: HTMLElement;
+
+  interval: any;
+  itemsCount: number = 0;
+  container: HTMLElement;
 
   @Listen("imageClick")
   handleImageClick(e: CustomEvent<ImageClickEvent>) {
     console.log("image clicked ", e.detail.src);
   }
 
-  container: HTMLElement;
+  @Watch('source')
+  parseMyArrayProp(newValue: string) {
+    if (newValue) {
+      this.images = JSON.parse(newValue)
+      this.itemsCount = this.images.length;
+    };
+  }
 
-  images = [
-    {src: "https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=700", alt: "winter"},
-    {src: "https://images.unsplash.com/photo-1548777123-e216912df7d8?w=700", alt: "winter2"},
-    {src: "https://images.unsplash.com/photo-1517299321609-52687d1bc55a?w=700", alt: "winter3"},
-  ];
+  componentWillLoad() {
+    this.parseMyArrayProp(this.source);
+  }
 
-  itemsCount = this.images.length;
+  componentDidLoad() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion)').matches;
 
-  interval: any;
+    if (!prefersReducedMotion) {
+      this.interval = setInterval(() => { this.next() }, this.time || 2000);
+    }
+  }
+
+  disconnectedCallback() {
+    clearInterval(this.interval);
+  }
 
   next = () => this.activeItem === this.itemsCount ? this.activeItem = 1 : this.activeItem++;
 
@@ -49,18 +72,6 @@ export class MyCarousel {
 
     this.previuos();
   };
-
-  componentDidLoad() {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion)').matches;
-
-    if (!prefersReducedMotion) {
-      this.interval = setInterval(() => { this.next() }, this.time || 2000);
-    }
-  }
-
-  disconnectedCallback() {
-    clearInterval(this.interval);
-  }
 
   render() {
     return (

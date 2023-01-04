@@ -8,6 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { ImageClickEvent } from "./components/my-carousel/my-carousel-image";
 export namespace Components {
     interface MyCarousel {
+        "source": string;
         "time": number;
     }
     interface MyCarouselImage {
@@ -61,6 +62,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface MyCarousel {
+        "source": string;
         "time"?: number;
     }
     interface MyCarouselImage {
